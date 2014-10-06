@@ -55,6 +55,7 @@ public class DefaultServer implements Server {
 		selector = Selector.open();
 		sschannel = ServerSocketChannel.open();
 		sschannel.configureBlocking(false);
+		System.out.println("Listening to " + serviceInformation.getAddress() + " port : " + serviceInformation.getPort());
 		address = new InetSocketAddress(serviceInformation.getAddress(), serviceInformation.getPort());
 		ServerSocket ss = sschannel.socket();
 		ss.bind(address);
