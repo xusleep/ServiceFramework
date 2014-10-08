@@ -68,7 +68,7 @@
 		<list>
 			<bean class="servicecenter.service.ServiceInformation">
 				<property name="address">
-					<value>localhost</value>
+					<value>1</value>
 				</property>
 				<property name="port">
 					<value>5002</value>
