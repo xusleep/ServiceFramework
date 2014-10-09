@@ -2,11 +2,15 @@ package service.framework.io.master;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,9 +54,34 @@ public class ServiceRegisterEventConsumer implements EventConsumer {
 			//执行
 			ServiceStartedEvent objServiceOnReadEvent = (ServiceStartedEvent) event;
 			ServiceInformation serviceInformation = (ServiceInformation)applicationContext.getBean("serviceInformation");
-			serviceInformation.setServiceName("addService");
-			serviceInformation.setServiceMethod("add");
-			String strServiceInformation = SerializeUtils.serializeServiceInformation(serviceInformation);
+			List<ServiceInformation> serviceInformationList = new LinkedList<ServiceInformation>();
+			//获取所有服务，将服务注册到注册中心
+			Map serviceList = applicationContext.getBeansOfType(ProviderBean.class);
+			Iterator keys = serviceList.keySet().iterator();
+			while(keys.hasNext()){
+				String beanName = (String) keys.next();
+				ProviderBean bean = (ProviderBean) serviceList.get(beanName);
+				String interfaceName = bean.getInterfaceName();
+				try {
+					Class interfaceclass = Class.forName(interfaceName);
+					Method[] methods = interfaceclass.getMethods();
+					for(int i = 0; i < methods.length; i++){
+						ServiceInformation subServiceInformation = new ServiceInformation();
+						subServiceInformation.setAddress(serviceInformation.getAddress());
+						subServiceInformation.setPort(serviceInformation.getPort());
+						subServiceInformation.setServiceMethod(methods[i].getName());
+						subServiceInformation.setServiceName(beanName);
+						subServiceInformation.setServiceVersion(bean.getVersion());
+						serviceInformationList.add(subServiceInformation);
+						System.out.println("service name : " + beanName + " method name : " + methods[i].getName());
+					}
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			String strServiceInformation = SerializeUtils.serializeServiceInformationList(serviceInformationList);
 			ConsumerBean objConsumerBean = (ConsumerBean)applicationContext.getBean("linkToServiceCenter");
 			List<String> args = new LinkedList<String>();
 			args.add(strServiceInformation);

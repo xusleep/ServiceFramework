@@ -52,7 +52,7 @@ public class StartClient extends AbstractJob {
 		try {
 			for(long i = 1; i < 100000000; i++)
 			{
-				Thread.sleep(1000);
+				Thread.sleep(10);
 		    	List<String> args1 = new LinkedList<String>();
 		    	String a = "" + aint.incrementAndGet();
 		    	String b = "" + aint.incrementAndGet();
@@ -94,7 +94,7 @@ public class StartClient extends AbstractJob {
 	 	ApplicationContext applicationContext = new ClassPathXmlApplicationContext("ClientServiceConfig.xml");
     	ClientManagement cmm = new ClientManagement();
 		StartClient job1 = new StartClient((ConsumerBean)applicationContext.getBean("addService"));
-		job1.setThreadCount(50);
+		job1.setThreadCount(10);
 		List<JobInterface> jobList = new LinkedList<JobInterface>();
 		jobList.add(job1);
 		MainConcurrentThread mct1 = new MainConcurrentThread(jobList);

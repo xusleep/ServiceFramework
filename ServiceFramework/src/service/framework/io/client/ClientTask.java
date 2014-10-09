@@ -132,6 +132,7 @@ public class ClientTask implements Callable {
 	        }
 		}
 		catch(IOException ex){
+			System.out.println("send error: " +ex.getMessage());
 			ex.printStackTrace();
 		}
 		return result;
