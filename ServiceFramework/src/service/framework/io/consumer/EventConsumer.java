@@ -1,4 +1,4 @@
-package service.framework.io.master;
+package service.framework.io.consumer;
 
 import java.io.IOException;
 

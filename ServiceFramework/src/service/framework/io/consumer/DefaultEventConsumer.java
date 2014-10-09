@@ -1,4 +1,4 @@
-package service.framework.io.master;
+package service.framework.io.consumer;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -18,6 +18,7 @@ import service.framework.io.event.ServiceOnWriteEvent;
 import service.framework.io.event.ServiceStartedEvent;
 import service.framework.io.event.ServiceStartingEvent;
 import service.framework.io.listener.ServiceEventMulticaster;
+import service.framework.io.master.MasterHandler;
 import service.framework.io.server.Server;
 import service.framework.protocol.ShareingProtocolData;
 import service.framework.provide.ProviderBean;
@@ -166,6 +167,11 @@ public class DefaultEventConsumer implements EventConsumer {
         return tmp;
     }
     
+    /**
+     * 关闭通道连接
+     * @param channel
+     * @throws IOException
+     */
 	private void closeChanel(SocketChannel channel) throws IOException{
 		if(channel!=null)
 		{

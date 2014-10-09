@@ -5,10 +5,11 @@ import java.util.List;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import service.framework.io.master.DefaultEventConsumer;
-import service.framework.io.master.EventConsumer;
+import service.framework.io.consumer.DefaultEventConsumer;
+import service.framework.io.consumer.EventConsumer;
+import service.framework.io.consumer.ServiceRegisterEventConsumer;
+import service.framework.io.master.MasterHandler;
 import service.framework.io.master.MasterManagement;
-import service.framework.io.master.ServiceRegisterEventConsumer;
 import service.framework.io.server.Server;
 
 
@@ -27,7 +28,8 @@ public class StartService {
             List<EventConsumer> eventConsumerList = new LinkedList<EventConsumer>();
             eventConsumerList.add(new DefaultEventConsumer(applicationContext, objServer.getServiceEventMulticaster()));
     		eventConsumerList.add(new ServiceRegisterEventConsumer(applicationContext,  objServer.getServiceEventMulticaster()));
-            new MasterManagement(objServer, 400, eventConsumerList).start();
+    		MasterHandler objMasterHandler = new MasterHandler(400, eventConsumerList);
+            new MasterManagement(objServer, objMasterHandler).start();
         }
         catch (Exception e) {
             System.out.println("Server error: " + e.getMessage());
