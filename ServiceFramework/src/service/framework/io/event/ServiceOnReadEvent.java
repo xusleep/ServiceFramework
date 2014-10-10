@@ -3,22 +3,23 @@ package service.framework.io.event;
 import java.nio.channels.SelectionKey;
 
 import service.framework.io.server.Server;
+import service.framework.io.server.Worker;
 
 public class ServiceOnReadEvent implements ServiceEvent {
 	private SelectionKey selectionKey;
-	private Server server;
+	private Worker server;
 	
-	public ServiceOnReadEvent(SelectionKey selectionKey, Server server)
+	public ServiceOnReadEvent(SelectionKey selectionKey, Worker server)
 	{
 		this.selectionKey = selectionKey;
 		this.server = server;
 	}
 
-	public Server getServer() {
+	public Worker getServer() {
 		return server;
 	}
 
-	public void setServer(Server server) {
+	public void setServer(Worker server) {
 		this.server = server;
 	}
 

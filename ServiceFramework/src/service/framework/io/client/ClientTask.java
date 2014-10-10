@@ -2,42 +2,15 @@ package service.framework.io.client;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import service.framework.io.client.comsume.ClientManagement;
-import service.framework.io.client.comsume.ConsumerBean;
-import service.framework.io.entity.IOSession;
-import service.framework.io.event.ServiceOnAcceptedEvent;
-import service.framework.io.event.ServiceOnClosedEvent;
-import service.framework.io.event.ServiceOnConnectedEvent;
-import service.framework.io.event.ServiceOnErrorEvent;
-import service.framework.io.event.ServiceOnReadEvent;
-import service.framework.io.event.ServiceOnWriteEvent;
-import service.framework.io.event.ServiceStartedEvent;
-import service.framework.io.event.ServiceStartingEvent;
-import service.framework.io.listener.ServiceEventMulticaster;
-import service.framework.io.server.Server;
+import service.framework.io.context.DefaultServiceContext;
 import service.framework.protocol.ShareingProtocolData;
 import service.framework.provide.entity.RequestEntity;
 import service.framework.provide.entity.ResponseEntity;
@@ -110,7 +83,7 @@ public class ClientTask implements Callable {
 	                    //在这里可以给服务端发送信息哦  
 	                    channel.shutdownOutput();
 	                    //在和服务端连接成功之后，为了可以接收到服务端的信息，需要给通道设置读的权限。  
-	                    IOSession request = new IOSession(channel);
+	                    DefaultServiceContext request = new DefaultServiceContext(channel);
 	                    channel.register(this.selector, SelectionKey.OP_READ, request); 
 	                    // 获得了可读的事件  
 	                } else if (key.isReadable()) {
@@ -124,7 +97,7 @@ public class ClientTask implements Callable {
                         }
                         else
                         {
-	                        IOSession request = (IOSession)key.attachment();
+	                        DefaultServiceContext request = (DefaultServiceContext)key.attachment();
 	                        result = SerializeUtils.deserializeResponse(new String(request.getDataInput(), ShareingProtocolData.FRAMEWORK_IO_ENCODING));
                         } 
 	                }  
@@ -150,7 +123,7 @@ public class ClientTask implements Callable {
      * @param sc 套接通道
      */
     private static int BUFFER_SIZE = 1024;
-    public static boolean readRequest(SocketChannel sc, IOSession request) throws IOException {
+    public static boolean readRequest(SocketChannel sc, DefaultServiceContext request) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
         int off = 0;
         int r = 0;
@@ -191,7 +164,7 @@ public class ClientTask implements Callable {
         try {
             // 读取客户端数据
             SocketChannel sc = (SocketChannel) key.channel();
-            IOSession request = (IOSession)key.attachment();
+            DefaultServiceContext request = (DefaultServiceContext)key.attachment();
             return readRequest(sc, request);
         }
         catch (Exception e) {

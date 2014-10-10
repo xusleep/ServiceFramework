@@ -23,13 +23,13 @@
 	</property>
 </bean>
 <!-- 设置客户端连接路由，该路由将从服务中心取得服务列表，并从服务列表中获得一个服务 -->
-<bean id="clientRoute" class= "service.framework.io.client.comsume.ClientRoute">
+<bean id="clientRoute" class= "service.framework.route.ClientRoute">
 	<property name="serviceCenterConsumerBean">
 		<ref bean="linkedToServiceCenterCB"></ref>
 	</property>
 	<property name="filters">
 		<list>
-			<bean class="service.framework.io.client.comsume.ClientRouteFilter"></bean>
+			<bean class="service.framework.route.filters.ClientRouteFilter"></bean>
 		</list>
 	</property>
 </bean>
@@ -51,7 +51,7 @@
 		<value>test</value>
 	</property>
 </bean>
-<bean id="linkedToServiceCenter" class="service.framework.route.DefaultClientRoute">
+<bean id="linkedToServiceCenter" class="service.framework.route.DefaultRoute">
 	<property name="serviceList">
 		<list>
 			<bean class="servicecenter.service.ServiceInformation">

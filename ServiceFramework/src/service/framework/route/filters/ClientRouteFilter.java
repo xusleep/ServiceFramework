@@ -1,8 +1,7 @@
-package service.framework.io.client.comsume;
+package service.framework.route.filters;
 
 import java.util.List;
 
-import service.framework.route.RouteFilter;
 import servicecenter.service.ServiceInformation;
 
 public class ClientRouteFilter implements RouteFilter{

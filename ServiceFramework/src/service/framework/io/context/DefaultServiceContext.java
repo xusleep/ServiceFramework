@@ -1,4 +1,4 @@
-package service.framework.io.entity;
+package service.framework.io.context;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -14,16 +14,15 @@ import java.nio.channels.SocketChannel;
  * @version 1.0
  */
 
-public class IOSession {
+public class DefaultServiceContext implements ServiceContext {
 	private SocketChannel sc;
 	private byte[] dataInput = null;;
 	Object obj;
-	private int registerInterestOps = SelectionKey.OP_READ;
 
-	public IOSession() {
+	public DefaultServiceContext() {
 	}
 
-	public IOSession(SocketChannel sc) {
+	public DefaultServiceContext(SocketChannel sc) {
 		this.sc = sc;
 	}
 
@@ -50,13 +49,4 @@ public class IOSession {
 	public void setDataInput(byte[] dataInput) {
 		this.dataInput = dataInput;
 	}
-
-	public int getRegisterInterestOps() {
-		return registerInterestOps;
-	}
-
-	public void setRegisterInterestOps(int registerInterestOps) {
-		this.registerInterestOps = registerInterestOps;
-	}
-
 }

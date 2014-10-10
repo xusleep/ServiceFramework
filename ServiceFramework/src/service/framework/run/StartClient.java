@@ -52,14 +52,22 @@ public class StartClient extends AbstractJob {
 		try {
 			for(long i = 1; i < 100000000; i++)
 			{
-				Thread.sleep(10);
+				
 		    	List<String> args1 = new LinkedList<String>();
 		    	String a = "" + aint.incrementAndGet();
 		    	String b = "" + aint.incrementAndGet();
 		    	args1.add(a);
 		    	args1.add(b);
-		    	long id = cb.prcessRequest(args1);
-		    	System.out.println("Thread.currentThread().getId() : " + Thread.currentThread().getId() + "  a = " + a + " b = "  + b + " result : " + cb.getResult(id));
+		    	try
+		    	{
+		    		long id = cb.prcessRequest(args1);
+		    		System.out.println("Thread.currentThread().getId() : " + Thread.currentThread().getId() + "  a = " + a + " b = "  + b + " result : " + cb.getResult(id));
+		    	}
+		    	catch(Exception ex){
+		    		long id = cb.prcessRequest(args1);
+		    		System.out.println("retry Thread.currentThread().getId() : " + Thread.currentThread().getId() + "  a = " + a + " b = "  + b + " result : " + cb.getResult(id));
+		    	
+		    	}
 			}
 		} catch (InterruptedException e2) {
 			// TODO Auto-generated catch block
@@ -94,7 +102,7 @@ public class StartClient extends AbstractJob {
 	 	ApplicationContext applicationContext = new ClassPathXmlApplicationContext("ClientServiceConfig.xml");
     	ClientManagement cmm = new ClientManagement();
 		StartClient job1 = new StartClient((ConsumerBean)applicationContext.getBean("addService"));
-		job1.setThreadCount(10);
+		job1.setThreadCount(1);
 		List<JobInterface> jobList = new LinkedList<JobInterface>();
 		jobList.add(job1);
 		MainConcurrentThread mct1 = new MainConcurrentThread(jobList);

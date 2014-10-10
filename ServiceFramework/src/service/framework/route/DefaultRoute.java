@@ -5,7 +5,7 @@ import java.util.List;
 import service.framework.provide.entity.RequestEntity;
 import servicecenter.service.ServiceInformation;
 
-public class DefaultClientRoute implements Route {
+public class DefaultRoute implements Route {
 	private List<ServiceInformation> serviceList;
 	
 	

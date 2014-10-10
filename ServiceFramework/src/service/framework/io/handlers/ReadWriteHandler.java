@@ -1,53 +1,58 @@
-package service.framework.io.consumer;
+package service.framework.io.handlers;
+
+import static service.framework.io.fire.Fires.fireCommonEvent;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import service.framework.io.entity.IOSession;
+import service.framework.io.context.DefaultServiceContext;
+import service.framework.io.context.ServiceContext;
 import service.framework.io.event.ServiceEvent;
 import service.framework.io.event.ServiceOnErrorEvent;
 import service.framework.io.event.ServiceOnReadEvent;
 import service.framework.io.event.ServiceOnWriteEvent;
 import service.framework.io.event.ServiceStartedEvent;
 import service.framework.io.event.ServiceStartingEvent;
-import service.framework.io.listener.ServiceEventMulticaster;
-import service.framework.io.master.MasterHandler;
-import service.framework.io.server.Server;
+import service.framework.io.fire.MasterHandler;
 import service.framework.protocol.ShareingProtocolData;
 import service.framework.provide.ProviderBean;
 import service.framework.provide.entity.RequestEntity;
 import service.framework.provide.entity.ResponseEntity;
 import service.framework.serialization.SerializeUtils;
 
-public class DefaultEventConsumer implements EventConsumer {
+/**
+ * 这里是默认的事件处理handler
+ * 
+ * @author zhonxu
+ *
+ */
+public class ReadWriteHandler implements Handler {
 	private AtomicInteger aint = new AtomicInteger(0);
 	
 	private final ApplicationContext applicationContext;
-	private final ServiceEventMulticaster objServiceEventMulticaster;
 	
-	public DefaultEventConsumer(ApplicationContext applicationContext, ServiceEventMulticaster objServiceEventMulticaster){
+	public ReadWriteHandler(ApplicationContext applicationContext){
 		this.applicationContext = applicationContext;
-		this.objServiceEventMulticaster = objServiceEventMulticaster;
 	}
 	
 	@Override
-	public void comsume(ServiceEvent event) throws IOException {
+	public void handleRequest(ServiceContext context, ServiceEvent event) throws IOException {
 		// TODO Auto-generated method stub
 		if (event instanceof ServiceOnReadEvent) {
 			// TODO Auto-generated method stub
 			ServiceOnReadEvent objServiceOnReadEvent = (ServiceOnReadEvent) event;
 			SelectionKey key = objServiceOnReadEvent.getSelectionKey();
+			DefaultServiceContext request = new DefaultServiceContext((SocketChannel)key.channel());
+			key.attach(request);
 			boolean succ = read(key);
 			if(succ)
 			{
-				this.objServiceEventMulticaster.multicastEvent(new ServiceOnWriteEvent(key));
+				fireCommonEvent(new ServiceOnWriteEvent(key));
 			}
 			//可能是客户端主动关闭了连接，因此这里也要关闭
 			else
@@ -64,7 +69,7 @@ public class DefaultEventConsumer implements EventConsumer {
 			ServiceOnWriteEvent objServiceOnReadEvent = (ServiceOnWriteEvent) event;
 			SelectionKey key = objServiceOnReadEvent.getSelectionKey();
 			try {
-				IOSession request = (IOSession) key.attachment();
+				DefaultServiceContext request = (DefaultServiceContext) key.attachment();
 				String receiveData = new String(request.getDataInput(), ShareingProtocolData.FRAMEWORK_IO_ENCODING);
 				RequestEntity objRequestEntity = SerializeUtils.deserializeRequest(receiveData);
 				ProviderBean objProviderBean = (ProviderBean)applicationContext.getBean(objRequestEntity.getServiceName());
@@ -110,7 +115,7 @@ public class DefaultEventConsumer implements EventConsumer {
      * @param sc 套接通道
      */
     private static int BUFFER_SIZE = 1024;
-    public static boolean readRequest(SocketChannel sc, IOSession request) throws IOException {
+    public static boolean readRequest(SocketChannel sc, DefaultServiceContext request) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
         int off = 0;
         int r = 0;
@@ -151,7 +156,7 @@ public class DefaultEventConsumer implements EventConsumer {
     public boolean read(SelectionKey key) throws IOException {
         // 读取客户端数据
         SocketChannel sc = (SocketChannel) key.channel();
-        IOSession request = (IOSession)key.attachment();
+        DefaultServiceContext request = (DefaultServiceContext)key.attachment();
         return readRequest(sc, request);
     }
     

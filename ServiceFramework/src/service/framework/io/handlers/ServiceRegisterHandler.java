@@ -1,7 +1,6 @@
-package service.framework.io.consumer;
+package service.framework.io.handlers;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -10,44 +9,38 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import service.framework.io.client.comsume.ConsumerBean;
-import service.framework.io.entity.IOSession;
+import service.framework.io.context.DefaultServiceContext;
+import service.framework.io.context.ServiceContext;
 import service.framework.io.event.ServiceEvent;
-import service.framework.io.event.ServiceOnErrorEvent;
-import service.framework.io.event.ServiceOnReadEvent;
-import service.framework.io.event.ServiceOnWriteEvent;
 import service.framework.io.event.ServiceStartedEvent;
-import service.framework.io.event.ServiceStartingEvent;
-import service.framework.io.listener.ServiceEventMulticaster;
-import service.framework.io.server.Server;
-import service.framework.protocol.ShareingProtocolData;
 import service.framework.provide.ProviderBean;
-import service.framework.provide.entity.RequestEntity;
-import service.framework.provide.entity.ResponseEntity;
 import service.framework.serialization.SerializeUtils;
-import servicecenter.service.ServiceCenterUtils;
 import servicecenter.service.ServiceInformation;
 
-public class ServiceRegisterEventConsumer implements EventConsumer {
+/***
+ * 这个handler只针对配置服务中心的时候使用
+ * 服务启动的时候，会发送一个ServiceStartedEvent，这里接受到了以后
+ * 进行处理，并且向服务中心，发送当前服务的服务列表信息
+ * @author zhonxu
+ *
+ */
+public class ServiceRegisterHandler implements Handler {
 	private AtomicInteger aint = new AtomicInteger(0);
 	
 	private final ApplicationContext applicationContext;
-	private final ServiceEventMulticaster objServiceEventMulticaster;
 	
-	public ServiceRegisterEventConsumer(ApplicationContext applicationContext, ServiceEventMulticaster objServiceEventMulticaster){
+	public ServiceRegisterHandler(ApplicationContext applicationContext){
 		this.applicationContext = applicationContext;
-		this.objServiceEventMulticaster = objServiceEventMulticaster;
 	}
 	
 	@Override
-	public void comsume(ServiceEvent event) throws IOException {
+	public void handleRequest(ServiceContext context, ServiceEvent event) throws IOException {
 		// TODO Auto-generated method stub
 		if (event instanceof ServiceStartedEvent) {
 			// TODO Auto-generated method stub
@@ -116,7 +109,7 @@ public class ServiceRegisterEventConsumer implements EventConsumer {
      * @param sc 套接通道
      */
     private static int BUFFER_SIZE = 1024;
-    public static boolean readRequest(SocketChannel sc, IOSession request) throws IOException {
+    public static boolean readRequest(SocketChannel sc, DefaultServiceContext request) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
         int off = 0;
         int r = 0;
@@ -157,7 +150,7 @@ public class ServiceRegisterEventConsumer implements EventConsumer {
     public boolean read(SelectionKey key) throws IOException {
         // 读取客户端数据
         SocketChannel sc = (SocketChannel) key.channel();
-        IOSession request = (IOSession)key.attachment();
+        DefaultServiceContext request = (DefaultServiceContext)key.attachment();
         return readRequest(sc, request);
     }
     

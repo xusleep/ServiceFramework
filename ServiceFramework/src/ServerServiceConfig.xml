@@ -63,7 +63,7 @@
 	</property>
 </bean>
 <!-- 设置连接到服务器注册中心的路由 -->
-<bean id="linkedToServiceCenterInform" class="service.framework.route.DefaultClientRoute">
+<bean id="linkedToServiceCenterInform" class="service.framework.route.DefaultRoute">
 	<property name="serviceList">
 		<list>
 			<bean class="servicecenter.service.ServiceInformation">
@@ -82,9 +82,6 @@
 	<constructor-arg>
 		<ref bean="serviceInformation"/>
 	</constructor-arg>
-	<constructor-arg>
-		<ref bean="defaultServiceEventMulticaster"/>
-	</constructor-arg>
 </bean>
 <bean id="serviceInformation" class="servicecenter.service.ServiceInformation">
 	<property name="address">
@@ -93,12 +90,5 @@
 	<property name="port">
 		<value>5001</value>
 	</property>
-</bean>
-<bean id="defaultServiceEventMulticaster" class="service.framework.io.listener.DefaultServiceEventMulticaster">
-	<property name="listeners">
-		<ref bean="defaultServiceWriterListener"/>
-	</property>
-</bean>
-<bean id="defaultServiceWriterListener" class="service.framework.io.listener.DefaultServiceWriterListener">
 </bean>
 </beans>
