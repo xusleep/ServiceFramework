@@ -44,6 +44,7 @@ public class ReadWriteHandler implements Handler {
 	public void handleRequest(ServiceContext context, ServiceEvent event) throws IOException {
 		// TODO Auto-generated method stub
 		if (event instanceof ServiceOnReadEvent) {
+			System.out.println("enter read...... ");
 			// TODO Auto-generated method stub
 			ServiceOnReadEvent objServiceOnReadEvent = (ServiceOnReadEvent) event;
 			SelectionKey key = objServiceOnReadEvent.getSelectionKey();
@@ -64,7 +65,9 @@ public class ReadWriteHandler implements Handler {
 					e.printStackTrace();
 				}
 			}
+			System.out.println("exit read...... ");
 		} else if (event instanceof ServiceOnWriteEvent) {
+			System.out.println("enter write...... ");
 			aint.incrementAndGet();
 			ServiceOnWriteEvent objServiceOnReadEvent = (ServiceOnWriteEvent) event;
 			SelectionKey key = objServiceOnReadEvent.getSelectionKey();
@@ -80,6 +83,7 @@ public class ReadWriteHandler implements Handler {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			System.out.println("exit write...... ");
 		}
 		else if(event instanceof ServiceOnErrorEvent){
 			System.out.println("出现了错误" + ((ServiceOnErrorEvent)event).getMsg());
@@ -115,13 +119,20 @@ public class ReadWriteHandler implements Handler {
      * @param sc 套接通道
      */
     private static int BUFFER_SIZE = 1024;
-    public static boolean readRequest(SocketChannel sc, DefaultServiceContext request) throws IOException {
-        ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+    public static boolean readRequest(SocketChannel sc, DefaultServiceContext request){
+        System.out.println("enter readRequest ---------------------------------");
+    	ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
         int off = 0;
         int r = 0;
         byte[] data = new byte[BUFFER_SIZE * 10];
         buffer.clear();
-        r = sc.read(buffer);
+        try {
+			r = sc.read(buffer);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
         // 如果读取到的数据为-1长度说明，客户端试图关闭，那么我们也关闭
         if (r == -1) 
         {
@@ -135,9 +146,15 @@ public class ReadWriteHandler implements Handler {
             System.arraycopy(buf, 0, data, off, r);
             off += r;
             buffer.clear();
-            r = sc.read(buffer);
+            try {
+				r = sc.read(buffer);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
             //读到了末尾，退出
-            if (r == -1) 
+            if (r <= 0) 
             {
             	break;
             }
@@ -145,6 +162,7 @@ public class ReadWriteHandler implements Handler {
         byte[] req = new byte[off];
         System.arraycopy(data, 0, req, 0, off);
         request.setDataInput(req);
+        System.out.println("exit readRequest ---------------------------------");
         return true;
     }
 

@@ -102,7 +102,7 @@ public class StartClient extends AbstractJob {
 	 	ApplicationContext applicationContext = new ClassPathXmlApplicationContext("ClientServiceConfig.xml");
     	ClientManagement cmm = new ClientManagement();
 		StartClient job1 = new StartClient((ConsumerBean)applicationContext.getBean("addService"));
-		job1.setThreadCount(1);
+		job1.setThreadCount(10);
 		List<JobInterface> jobList = new LinkedList<JobInterface>();
 		jobList.add(job1);
 		MainConcurrentThread mct1 = new MainConcurrentThread(jobList);

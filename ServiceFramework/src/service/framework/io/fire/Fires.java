@@ -18,15 +18,13 @@ public class Fires
 	 * 处理客户请求,管理用户的联结池,并唤醒队列中的线程进行处理
 	 */
 	public static void fireCommonEvent(ServiceEvent event) {
-		try {
-			MasterHandler.pool.put(event);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		System.out.println("putting into the pool ... ");
+		MasterHandler.submitEventPool(event);
+		System.out.println("MasterHandler.pool.size() = " + MasterHandler.pool.size());
 	}
 	
 	public static void fireRegisterChannel(SocketChannel sc) throws Exception{
+		System.out.println("register " + sc.getRemoteAddress());
 		WorkerPool.getInstance().register(sc);
 	}
 }

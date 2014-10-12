@@ -33,6 +33,7 @@ public class MasterHandler extends Thread {
             try 
             {
             	final ServiceEvent event = pool.take();
+	            System.out.println("pool.take() ... ");	
             	// 将事件处理任务交由线程池执行，处理逻辑独立处理在consumer里面完成
             	handleEvent(event);
             }
@@ -43,26 +44,40 @@ public class MasterHandler extends Thread {
         }
 	}
 
-	
+	/**
+	 * 处理客户请求,管理用户的联结池,并唤醒队列中的线程进行处理
+	 */
+	public static void submitEventPool(ServiceEvent event) {
+		try {
+			pool.put(event);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * 注意此方法消费的队列，开始
 	 * @param event
 	 */
 	public void handleEvent(final ServiceEvent event){
-		this.objExecutorService.execute(new Runnable(){
-			@Override
-			public void run() {
+//		this.objExecutorService.execute(new Runnable(){
+//			@Override
+//			public void run() {
             	try {
+            		System.out.println("this.objExecutorService.execute() ...");
             		for(Handler handler : eventHandlerList)
+            		{
+            			System.out.println("handler.handleRequest(null, event); ... ");
             			handler.handleRequest(null, event);
+            		}
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}
-    	});
+//			}
+//    	});
 	}
 }

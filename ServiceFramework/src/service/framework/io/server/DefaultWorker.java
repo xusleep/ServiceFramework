@@ -89,6 +89,7 @@ public class DefaultWorker implements Worker {
 	 * 提交新的客户端写请求于主服务线程的回应池中
 	 */
 	public void submitOpeRegister(SocketChannel schannel) {
+		System.out.println("submitOpeRegister ...");
 		wpool.offer(schannel);
 		selector.wakeup(); // 解除selector的阻塞状态，以便注册新的通道
 	}

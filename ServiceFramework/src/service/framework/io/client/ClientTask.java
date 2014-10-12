@@ -41,6 +41,7 @@ public class ClientTask implements Callable {
 	}
 	
 	private void writeMessage(SocketChannel channel) throws IOException{
+		System.out.println("enter writeMessage ------------------------------------  ");
 		String sendData = SerializeUtils.serializeRequest(this.objRequestEntity);
         byte[] data = sendData.getBytes(ShareingProtocolData.FRAMEWORK_IO_ENCODING);
         //在这里可以给服务端发送信息
@@ -50,6 +51,7 @@ public class ClientTask implements Callable {
         while (buffer.hasRemaining()) {  
             channel.write(buffer);  
         } 
+        System.out.println("exit writeMessage ------------------------------------  ");
 	}
 
 	@Override
